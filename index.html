@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Secret Santa Hat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Figtree:wght@400;500;600;700&family=Kalam:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* Layout: one narrow column on pine felt, a hat up top, every name written on a paper slip */
+  --pine: #123326;
+  --pine-2: #1A4232;
+  --pine-3: #23533F;
+  --paper: #F4ECDD;
+  --paper-2: #DCD0BA;
+  --ink: #1D2621;
+  --berry: #B4233A;
+  --berry-2: #861727;
+  --gold: #D8A84A;
+  --mist: #A8C1B4;
+  --font-display: "Alfa Slab One", Rockwell, "Roboto Slab", Georgia, serif;
+  --font-body: "Figtree", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-hand: "Kalam", "Segoe Print", "Bradley Hand", "Comic Sans MS", cursive;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; }
+body {
+  background-color: var(--pine);
+  background-image:
+    radial-gradient(circle at 15% -5%, rgba(216, 168, 74, 0.14), transparent 40%),
+    radial-gradient(circle at 110% 70%, rgba(180, 35, 58, 0.10), transparent 45%);
+  background-attachment: fixed;
+  color: var(--paper);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+[hidden] { display: none !important; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.wrap {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 22px 18px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.stack { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+
+/* Header */
+.masthead { display: flex; align-items: center; gap: 14px; }
+.hat { width: 92px; flex: none; overflow: visible; }
+.shake { animation: shake 0.8s ease-in-out; transform-origin: 50% 90%; }
+@keyframes shake {
+  0%, 100% { transform: rotate(0); }
+  15% { transform: rotate(-9deg) translateY(-2px); }
+  35% { transform: rotate(8deg); }
+  55% { transform: rotate(-6deg) translateY(-1px); }
+  75% { transform: rotate(4deg); }
+}
+h1 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(34px, 10vw, 48px);
+  line-height: 0.95;
+  margin: 0;
+  text-wrap: balance;
+}
+h1 span { color: var(--gold); }
+.tagline { margin: 8px 0 0; color: var(--mist); font-size: 15px; line-height: 1.35; }
+
+/* Steps */
+.step {
+  background: var(--pine-2);
+  border: 1px solid rgba(216, 168, 74, 0.22);
+  border-radius: 18px;
+  padding: 18px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.step-head { display: flex; align-items: center; gap: 10px; }
+.step-num {
+  flex: none;
+  width: 28px; height: 28px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  border: 2px solid var(--gold);
+  color: var(--gold);
+  font-family: var(--font-display);
+  font-size: 14px;
+  line-height: 1;
+}
+.step-num.done { background: var(--gold); color: var(--pine); font-family: var(--font-body); font-weight: 700; font-size: 15px; }
+h2 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 21px;
+  line-height: 1.15;
+  margin: 0;
+  text-wrap: balance;
+}
+.count {
+  margin-left: auto;
+  flex: none;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--pine);
+  background: var(--gold);
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.hint { margin: -4px 0 0; color: var(--mist); font-size: 14.5px; line-height: 1.45; }
+.hint strong { color: var(--paper); font-weight: 600; }
+
+/* Banners */
+.banner {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px;
+  background: rgba(216, 168, 74, 0.12);
+  border: 1px dashed rgba(216, 168, 74, 0.6);
+  border-radius: 14px;
+  padding: 12px 14px;
+  font-size: 14.5px;
+  line-height: 1.4;
+}
+.banner p { margin: 0; flex: 1 1 200px; }
+
+/* Controls */
+.field-row { display: flex; gap: 8px; }
+.field-label { font-size: 14px; font-weight: 600; color: var(--paper); margin-bottom: -6px; }
+.field-label span { color: var(--mist); font-weight: 500; }
+input[type="text"], select, textarea {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  font: inherit;
+  font-size: 16px;
+  color: var(--ink);
+  background: var(--paper);
+  border: 2px solid transparent;
+  border-radius: 12px;
+  padding: 11px 12px;
+  color-scheme: light;
+}
+textarea { resize: none; line-height: 1.4; }
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 34px;
+  background-image: linear-gradient(45deg, transparent 50%, var(--ink) 50%), linear-gradient(135deg, var(--ink) 50%, transparent 50%);
+  background-position: calc(100% - 18px) 52%, calc(100% - 12px) 52%;
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+  cursor: pointer;
+}
+input::placeholder { color: #7d7a70; }
+input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.btn {
+  font: inherit;
+  font-weight: 700;
+  font-size: 15.5px;
+  border: 0;
+  border-radius: 12px;
+  padding: 11px 16px;
+  cursor: pointer;
+  line-height: 1.2;
+  -webkit-tap-highlight-color: transparent;
+  white-space: nowrap;
+}
+.btn-berry { background: var(--berry); color: var(--paper); box-shadow: 0 3px 0 var(--berry-2); }
+.btn-berry:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--berry-2); }
+.btn-paper { background: var(--paper); color: var(--ink); box-shadow: 0 3px 0 var(--paper-2); }
+.btn-paper:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--paper-2); }
+.btn-ghost {
+  background: transparent;
+  color: var(--paper);
+  border: 1.5px solid rgba(168, 193, 180, 0.5);
+}
+.btn-ghost:hover { border-color: var(--mist); }
+.btn-link {
+  align-self: flex-start;
+  background: none; border: 0; padding: 4px 0;
+  color: var(--mist);
+  font: inherit; font-size: 14px; font-weight: 600;
+  text-decoration: underline; text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+/* Name slips */
+.slips { list-style: none; margin: 0; padding: 2px 0 0; display: flex; flex-wrap: wrap; gap: 12px 9px; }
+.slip {
+  position: relative;
+  max-width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background-color: var(--paper);
+  background-image: linear-gradient(to bottom, transparent 49%, rgba(29, 38, 33, 0.07) 50%, transparent 52%);
+  color: var(--ink);
+  border-radius: 3px;
+  padding: 5px 4px 5px 12px;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.25), 0 6px 14px rgba(0,0,0,0.22);
+  transform: rotate(var(--tilt, 0deg));
+}
+.slip-name {
+  font-family: var(--font-hand);
+  font-size: 19px;
+  line-height: 1.2;
+  padding-top: 2px;
+  overflow-wrap: anywhere;
+}
+.slip-x {
+  flex: none;
+  width: 30px; height: 30px;
+  display: grid; place-items: center;
+  border: 0; border-radius: 50%;
+  background: transparent;
+  color: var(--berry);
+  font: 700 20px/1 var(--font-body);
+  cursor: pointer;
+}
+.slip-x:hover { background: rgba(180, 35, 58, 0.1); }
+.empty { margin: 0; color: var(--mist); font-size: 14.5px; font-style: italic; }
+
+/* Rules */
+.rule-form { display: flex; flex-direction: column; gap: 10px; }
+.rule-pick { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; }
+.amp { font-family: var(--font-display); color: var(--gold); font-size: 18px; }
+.rules { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.rule {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--pine-3);
+  border-radius: 12px;
+  padding: 6px 6px 6px 14px;
+}
+.rule-pair { flex: 1; min-width: 0; font-family: var(--font-hand); font-size: 19px; line-height: 1.25; padding-top: 2px; overflow-wrap: anywhere; }
+.rule-pair .amp { font-size: 14px; margin: 0 6px; position: relative; top: -2px; }
+.rule .slip-x { color: var(--paper); }
+.rule .slip-x:hover { background: rgba(244, 236, 221, 0.12); }
+
+/* Messages */
+.msg { margin: 0; font-size: 14.5px; line-height: 1.4; }
+.msg:empty { display: none; }
+.msg.error {
+  color: #FFD6D6;
+  background: rgba(180, 35, 58, 0.22);
+  border-left: 4px solid var(--berry);
+  padding: 9px 12px;
+  border-radius: 8px;
+}
+
+/* Big action */
+.btn-draw {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 22px;
+  padding: 17px 20px;
+  border-radius: 16px;
+  box-shadow: 0 5px 0 var(--berry-2), 0 10px 24px rgba(0,0,0,0.25);
+  white-space: normal;
+}
+.btn-draw:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--berry-2); }
+.btn-draw[disabled] { opacity: 0.75; cursor: progress; }
+.footnote { margin: 0; color: var(--mist); font-size: 13px; text-align: center; }
+
+/* Paste a link */
+.paste {
+  border-top: 1px dashed rgba(168, 193, 180, 0.35);
+  padding-top: 18px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.paste h3 { margin: 0; font-size: 15px; font-weight: 700; }
+.paste p { margin: -6px 0 0; color: var(--mist); font-size: 14px; }
+
+/* Sealed: send list */
+.callout {
+  background: rgba(216, 168, 74, 0.12);
+  border-left: 4px solid var(--gold);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 14.5px;
+  line-height: 1.45;
+}
+.bar { height: 8px; border-radius: 999px; background: rgba(0,0,0,0.25); overflow: hidden; }
+.bar-fill { height: 100%; width: 0; background: var(--gold); border-radius: 999px; transition: width 0.4s ease; }
+.send-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.send-row {
+  display: flex; align-items: center; gap: 10px;
+  background-color: var(--paper);
+  background-image: linear-gradient(to bottom, transparent 49%, rgba(29, 38, 33, 0.07) 50%, transparent 52%);
+  color: var(--ink);
+  border-radius: 4px;
+  padding: 8px 8px 8px 14px;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.25), 0 6px 14px rgba(0,0,0,0.2);
+  transform: rotate(var(--tilt, 0deg));
+}
+.send-row.sent { background-color: var(--paper-2); box-shadow: 0 1px 0 rgba(0,0,0,0.2); }
+.send-who { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.send-name { font-family: var(--font-hand); font-size: 21px; font-weight: 700; line-height: 1.15; overflow-wrap: anywhere; padding-top: 2px; }
+.send-state { font-size: 12.5px; font-weight: 600; color: var(--berry); }
+.send-row.sent .send-state { color: #4E6B5C; }
+.send-row .btn { padding: 9px 12px; font-size: 14.5px; }
+.send-row.sent .btn-berry { background: var(--pine-3); box-shadow: 0 3px 0 #163a2b; }
+
+/* Person view: pulling a slip */
+.pull { align-items: center; text-align: center; gap: 16px; padding-top: 30px; }
+.stage { position: relative; width: 190px; height: 190px; margin: 0 auto; }
+.stage .hat { width: 190px; position: absolute; left: 0; bottom: 0; }
+.riser {
+  position: absolute;
+  left: 50%; top: 40px;
+  width: 44px; height: 58px;
+  margin-left: -22px;
+  background: var(--paper);
+  border-radius: 3px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  opacity: 0;
+  z-index: 0;
+}
+.riser.go { animation: rise-slip 0.9s 0.55s cubic-bezier(.3,.7,.3,1) both; }
+@keyframes rise-slip {
+  0% { transform: translateY(40px) rotate(-6deg); opacity: 0; }
+  30% { opacity: 1; }
+  100% { transform: translateY(-46px) rotate(8deg); opacity: 1; }
+}
+.eyebrow { margin: 0; font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold); }
+.pull-hi { font-family: var(--font-hand); font-weight: 700; font-size: clamp(40px, 12vw, 54px); line-height: 1.05; overflow-wrap: anywhere; }
+.pull-sub { margin: 0; color: var(--mist); font-size: 16px; max-width: 34ch; text-wrap: balance; }
+.pull .btn-draw { width: 100%; max-width: 360px; }
+.result { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.result h2 { font-size: 20px; }
+.keep { margin: 0; color: var(--mist); font-size: 15px; max-width: 34ch; text-wrap: balance; }
+.problem { width: 100%; text-align: left; }
+
+/* The gift tag */
+.tag {
+  position: relative;
+  margin: 4px auto 0;
+  width: min(100%, 320px);
+  padding: 34px 18px 22px;
+  background: var(--paper);
+  color: var(--ink);
+  border-radius: 6px;
+  text-align: center;
+  clip-path: polygon(14% 0, 86% 0, 100% 16%, 100% 100%, 0 100%, 0 16%);
+  transform-origin: 50% 0;
+  animation: unfold 0.7s cubic-bezier(.2,.9,.3,1.2) both;
+}
+.tag::before {
+  content: "";
+  position: absolute;
+  top: 10px; left: 50%;
+  width: 12px; height: 12px;
+  margin-left: -6px;
+  border-radius: 50%;
+  background: var(--pine);
+  box-shadow: 0 0 0 2px var(--gold);
+}
+.tag-to { display: block; font-size: 12.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--berry); }
+.tag-name { display: block; margin-top: 4px; font-family: var(--font-hand); font-size: 44px; font-weight: 700; line-height: 1.1; overflow-wrap: anywhere; }
+.tag-note { display: block; margin-top: 10px; padding-top: 10px; border-top: 1px dashed rgba(29, 38, 33, 0.3); font-size: 14.5px; line-height: 1.4; color: #3a4640; overflow-wrap: anywhere; }
+@keyframes unfold {
+  0% { transform: perspective(600px) rotateX(-88deg); opacity: 0; }
+  60% { opacity: 1; }
+  100% { transform: perspective(600px) rotateX(0); opacity: 1; }
+}
+
+/* Overlay */
+.overlay {
+  position: fixed; inset: 0;
+  z-index: 20;
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px 16px;
+  background: rgba(7, 20, 14, 0.9);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  overflow-y: auto;
+}
+.sheet {
+  width: 100%;
+  max-width: 420px;
+  background: var(--pine-2);
+  border: 1px solid rgba(216, 168, 74, 0.35);
+  border-radius: 22px;
+  padding: 24px 20px 20px;
+  display: flex; flex-direction: column; gap: 14px;
+  text-align: center;
+  animation: pop 0.22s ease-out;
+}
+@keyframes pop { from { transform: translateY(12px); opacity: 0; } to { transform: none; opacity: 1; } }
+.sheet h3 { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: 22px; line-height: 1.2; text-wrap: balance; }
+.sheet p { margin: 0; color: var(--mist); font-size: 15px; line-height: 1.45; }
+.sheet-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+.sheet-actions .btn { width: 100%; padding: 14px 16px; font-size: 16px; }
+
+@media (min-width: 520px) {
+  .wrap { padding-top: 34px; }
+  .masthead .hat { width: 108px; }
+  .step { padding: 20px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .riser { display: none; }
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <g id="hat-art">
+      <rect x="46" y="18" width="28" height="44" rx="2" fill="#F4ECDD" transform="rotate(-14 60 40)"/>
+      <path d="M52 30 h14 M52 36 h10" stroke="#B4233A" stroke-width="2" stroke-linecap="round" transform="rotate(-14 60 40)"/>
+      <rect x="70" y="8" width="28" height="50" rx="2" fill="#EADFCB" transform="rotate(5 84 33)"/>
+      <path d="M76 20 h15 M76 26 h11" stroke="#1D2621" stroke-width="2" stroke-linecap="round" transform="rotate(5 84 33)"/>
+      <rect x="94" y="20" width="26" height="42" rx="2" fill="#F4ECDD" transform="rotate(17 107 41)"/>
+      <path d="M99 31 h14 M99 37 h9" stroke="#123326" stroke-width="2" stroke-linecap="round" transform="rotate(17 107 41)"/>
+      <path d="M30 66 L132 66 C130 96 116 114 94 121 C74 127 58 126 44 138 C46 118 38 92 30 66 Z" fill="#B4233A"/>
+      <path d="M100 70 C98 92 88 108 70 116" stroke="#861727" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.6"/>
+      <rect x="22" y="56" width="118" height="18" rx="9" fill="#F4ECDD"/>
+      <circle cx="42" cy="139" r="10" fill="#F4ECDD"/>
+    </g>
+  </defs>
+</svg>
+
+<main class="wrap">
+
+  <!-- ============ ORGANIZER ============ -->
+  <div id="organizer" class="stack">
+    <header class="masthead">
+      <svg class="hat" id="hat" viewBox="0 0 160 150" aria-hidden="true"><use href="#hat-art"/></svg>
+      <div>
+        <h1>Secret <span>Santa</span></h1>
+        <p class="tagline">Everyone pulls a name from their own phone. Couples never pull each other.</p>
+      </div>
+    </header>
+
+    <!-- Setup -->
+    <div id="setup" class="stack">
+      <div class="banner" id="example-banner" hidden>
+        <p>These are <strong>sample names</strong> so you can see how it works.</p>
+        <button type="button" class="btn btn-paper" id="clear-examples">Clear and start my list</button>
+      </div>
+
+      <section class="step" aria-labelledby="names-title">
+        <div class="step-head">
+          <span class="step-num" aria-hidden="true">1</span>
+          <h2 id="names-title">Who's in the hat</h2>
+          <span class="count" id="count">0 people</span>
+        </div>
+        <form id="name-form" class="field-row" autocomplete="off">
+          <label for="name-input" class="sr">Name</label>
+          <input type="text" id="name-input" placeholder="Add a name" maxlength="40" enterkeyhint="done">
+          <button type="submit" class="btn btn-berry" id="add-name">Add</button>
+        </form>
+        <p class="msg" id="name-msg" role="status"></p>
+        <ul class="slips" id="slips"></ul>
+        <p class="empty" id="slips-empty" hidden>No names yet. Add the first one above.</p>
+        <button type="button" class="btn-link" id="clear-all" hidden>Remove everyone</button>
+      </section>
+
+      <section class="step" aria-labelledby="rules-title">
+        <div class="step-head">
+          <span class="step-num" aria-hidden="true">2</span>
+          <h2 id="rules-title">Can't pull each other</h2>
+        </div>
+        <p class="hint">Add spouses and partners here. Neither person can pull the other's name.</p>
+        <form id="rule-form" class="rule-form">
+          <div class="rule-pick">
+            <label for="rule-a" class="sr">First person</label>
+            <select id="rule-a"></select>
+            <span class="amp" aria-hidden="true">&amp;</span>
+            <label for="rule-b" class="sr">Second person</label>
+            <select id="rule-b"></select>
+          </div>
+          <button type="submit" class="btn btn-ghost" id="add-rule">Keep these two apart</button>
+        </form>
+        <p class="msg" id="rule-msg" role="status"></p>
+        <ul class="rules" id="rules"></ul>
+      </section>
+
+      <section class="step" aria-labelledby="seal-title">
+        <div class="step-head">
+          <span class="step-num" aria-hidden="true">3</span>
+          <h2 id="seal-title">Seal the hat</h2>
+        </div>
+        <p class="hint">Sealing matches everyone up once, so nobody gets stuck with their own name at the end. Then you text each person a private link, and they pull their slip whenever they want.</p>
+        <label for="note-input" class="field-label">Note on every slip <span>(optional)</span></label>
+        <input type="text" id="note-input" placeholder="Example: $50 limit, gifts on Christmas Eve" maxlength="90">
+        <p class="msg" id="draw-msg" role="alert"></p>
+        <button type="button" class="btn btn-berry btn-draw" id="seal">Seal the hat</button>
+        <p class="footnote">Your list is saved in this browser, on this phone.</p>
+      </section>
+
+      <section class="paste" aria-labelledby="paste-title">
+        <h3 id="paste-title">Got a link from the organizer?</h3>
+        <p>If your link opened this setup page instead of your slip, paste it here.</p>
+        <form id="paste-form" class="field-row" autocomplete="off">
+          <label for="paste-input" class="sr">Your link</label>
+          <input type="text" id="paste-input" placeholder="Paste your link">
+          <button type="submit" class="btn btn-paper">Open</button>
+        </form>
+        <p class="msg" id="paste-msg" role="status"></p>
+      </section>
+    </div>
+
+    <!-- Sealed: send links -->
+    <section id="sealed" class="step" aria-labelledby="send-title" hidden>
+      <div class="step-head">
+        <span class="step-num done" aria-hidden="true">&#10003;</span>
+        <h2 id="send-title">Send everyone their link</h2>
+        <span class="count" id="sent-count">0 sent</span>
+      </div>
+      <div class="bar"><div class="bar-fill" id="sent-bar"></div></div>
+      <p class="hint">The hat is sealed and <strong>nobody can see the matches here, not even you.</strong> Tap Copy, then paste it into a text to that one person. Each link only opens that person's slip, so don't open anyone else's.</p>
+      <div class="callout">Before you send everyone theirs, open your own link once to test it.</div>
+      <ul class="send-list" id="send-list"></ul>
+      <p class="footnote" id="hat-label"></p>
+      <button type="button" class="btn btn-ghost" id="start-over">Unseal and start over</button>
+    </section>
+  </div>
+
+  <!-- ============ PERSON PULLING A NAME ============ -->
+  <section id="person" class="stack pull" hidden>
+    <div class="stage" aria-hidden="true">
+      <div class="riser" id="riser"></div>
+      <svg class="hat" id="pull-hat" viewBox="0 0 160 150"><use href="#hat-art"/></svg>
+    </div>
+
+    <div id="ticket-ok" class="stack" style="align-items:center;gap:14px;width:100%">
+      <p class="eyebrow" id="pull-eyebrow">Secret Santa</p>
+      <h1 class="pull-hi" id="pull-hi">Hi there</h1>
+
+      <div id="before-pull" class="stack" style="align-items:center;gap:16px;width:100%">
+        <p class="pull-sub">Everyone's name is in the hat. Reach in and pull yours. Make sure nobody's looking over your shoulder.</p>
+        <button type="button" class="btn btn-berry btn-draw" id="pull">Pull a name from the hat</button>
+      </div>
+
+      <div id="after-pull" class="result" hidden>
+        <h2 id="result-title">You're buying a gift for</h2>
+        <div class="tag" id="tag">
+          <span class="tag-to">To</span>
+          <span class="tag-name" id="tag-name"></span>
+          <span class="tag-note" id="tag-note" hidden></span>
+        </div>
+        <p class="keep">Keep it a secret! This link will show the same name if you open it again.</p>
+      </div>
+    </div>
+
+    <div id="ticket-bad" class="stack problem" hidden>
+      <h1 class="pull-hi" style="font-size:36px;text-align:center">Hmm, no slip here</h1>
+      <p class="pull-sub" style="margin:0 auto;text-align:center">This link looks cut off. Ask the organizer to send it again, or paste the whole link below.</p>
+      <form id="paste-form-2" class="field-row" autocomplete="off">
+        <label for="paste-input-2" class="sr">Your link</label>
+        <input type="text" id="paste-input-2" placeholder="Paste your link">
+        <button type="submit" class="btn btn-paper">Open</button>
+      </form>
+      <p class="msg" id="paste-msg-2" role="status"></p>
+    </div>
+  </section>
+
+</main>
+
+<div class="overlay" id="overlay" hidden>
+  <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title"></div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  // Links point back to wherever this page is hosted. Inside a Claude artifact frame, use the artifact's address.
+  var ARTIFACT_URL = "https://claude.ai/artifact/4EDHJZRPZL8GSjHdTHC7pc";
+  var SHARE_URL = (function () {
+    try {
+      var loc = window.location;
+      var inFrame = window.self !== window.top;
+      if ((loc.protocol === "https:" || loc.protocol === "http:") && !inFrame) {
+        return loc.origin + loc.pathname.replace(/index\.html$/, "");
+      }
+    } catch (e) {}
+    return ARTIFACT_URL;
+  })();
+  var KEY = "secret-santa-hat-v2";
+  var OLD_KEY = "secret-santa-hat-v1";
+  var PULLED_KEY = "secret-santa-pulled-v2";
+  var TILTS = [-2, 1.4, -0.8, 2, -1.5, 0.7, -1.1, 1.7];
+  var EXAMPLE_NAMES = ["Grandma Jo", "Pop", "Mike", "Jenna", "Chris", "Dana", "Aunt Linda", "Uncle Ray", "Sam", "Taylor", "Megan", "Luke"];
+  var EXAMPLE_RULES = [["Grandma Jo", "Pop"], ["Mike", "Jenna"], ["Chris", "Dana"], ["Aunt Linda", "Uncle Ray"]];
+
+  var state = null;
+  var wired = false;
+
+  function $(id) { return document.getElementById(id); }
+
+  /* ---------- randomness ---------- */
+  function randInt(n) {
+    try {
+      if (window.crypto && window.crypto.getRandomValues) {
+        var buf = new Uint32Array(1);
+        var limit = Math.floor(4294967296 / n) * n;
+        var x;
+        do { window.crypto.getRandomValues(buf); x = buf[0]; } while (x >= limit);
+        return x % n;
+      }
+    } catch (e) {}
+    return Math.floor(Math.random() * n);
+  }
+  function shuffle(arr) {
+    for (var i = arr.length - 1; i > 0; i--) {
+      var j = randInt(i + 1);
+      var t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+    }
+    return arr;
+  }
+  function newId() { return "p" + Date.now().toString(36) + randInt(1e9).toString(36); }
+  function hatCode() {
+    var A = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789", s = "";
+    for (var i = 0; i < 4; i++) s += A[randInt(A.length)];
+    return s;
+  }
+
+  /*ALGO-START*/
+  function ruleKey(a, b) { return a < b ? a + "|" + b : b + "|" + a; }
+
+  // Returns {draw: {giverId: receiverId}} or {error: "stuck", who: id} or {error: "impossible"}
+  function makeDraw(ids, rules) {
+    var banned = {};
+    rules.forEach(function (r) { banned[ruleKey(r[0], r[1])] = true; });
+    function ok(g, r) { return g !== r && !banned[ruleKey(g, r)]; }
+
+    for (var s = 0; s < ids.length; s++) {
+      var g0 = ids[s];
+      if (!ids.some(function (r) { return ok(g0, r); })) return { error: "stuck", who: g0 };
+    }
+
+    // Fair draw: shuffle the whole hat until nobody pulls themselves or a blocked partner.
+    for (var t = 0; t < 40000; t++) {
+      var perm = shuffle(ids.slice());
+      var good = true;
+      for (var i = 0; i < ids.length; i++) {
+        if (!ok(ids[i], perm[i])) { good = false; break; }
+      }
+      if (good) {
+        var m = {};
+        ids.forEach(function (g, k) { m[g] = perm[k]; });
+        return { draw: m };
+      }
+    }
+
+    // Tight rules: search for any valid matching, in random order.
+    var owner = {};
+    function give(g, seen) {
+      var options = shuffle(ids.filter(function (r) { return ok(g, r); }));
+      for (var k = 0; k < options.length; k++) {
+        var r = options[k];
+        if (seen[r]) continue;
+        seen[r] = true;
+        if (owner[r] === undefined || give(owner[r], seen)) { owner[r] = g; return true; }
+      }
+      return false;
+    }
+    var order = shuffle(ids.slice());
+    for (var q = 0; q < order.length; q++) {
+      if (!give(order[q], {})) return { error: "impossible" };
+    }
+    var out = {};
+    Object.keys(owner).forEach(function (r) { out[owner[r]] = r; });
+    return { draw: out };
+  }
+  /*ALGO-END*/
+
+  /*TICKET-START*/
+  // A ticket is one person's sealed slip, packed into letters and digits so it fits in a link.
+  // It is scrambled so the match can't be read by glancing at the link. It is not a lock.
+  var B32 = "abcdefghijklmnopqrstuvwxyz234567";
+  var SEP = "\u001f";
+  function fnv(bytes) {
+    var h = 2166136261;
+    for (var i = 0; i < bytes.length; i++) { h ^= bytes[i]; h = Math.imul(h, 16777619) >>> 0; }
+    return h >>> 0;
+  }
+  function stream(seed) {
+    var a = seed >>> 0;
+    return function () {
+      a = (a + 0x6D2B79F5) >>> 0;
+      var t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) & 255;
+    };
+  }
+  function utf8(str) { return Array.prototype.slice.call(new TextEncoder().encode(str)); }
+  function fromUtf8(bytes) { return new TextDecoder("utf-8", { fatal: true }).decode(new Uint8Array(bytes)); }
+  function toB32(bytes) {
+    var out = "", bits = 0, val = 0;
+    for (var i = 0; i < bytes.length; i++) {
+      val = ((val << 8) | bytes[i]) & 0xffff;
+      bits += 8;
+      while (bits >= 5) { out += B32[(val >>> (bits - 5)) & 31]; bits -= 5; }
+    }
+    if (bits > 0) out += B32[(val << (5 - bits)) & 31];
+    return out;
+  }
+  function fromB32(str) {
+    var out = [], bits = 0, val = 0;
+    for (var i = 0; i < str.length; i++) {
+      var v = B32.indexOf(str[i]);
+      if (v < 0) return null;
+      val = ((val << 5) | v) & 0xffff;
+      bits += 5;
+      if (bits >= 8) { out.push((val >>> (bits - 8)) & 255); bits -= 8; }
+    }
+    return out;
+  }
+  function seedFor(salt) { return fnv(utf8("santa-hat|" + salt.join(","))); }
+  function makeTicket(giver, receiver, hat, note, saltBytes) {
+    var plain = utf8("1" + SEP + giver + SEP + receiver + SEP + hat + SEP + (note || ""));
+    var salt = saltBytes || [randInt(256), randInt(256), randInt(256)];
+    var ks = stream(seedFor(salt));
+    var body = plain.map(function (b) { return b ^ ks(); });
+    var c = fnv(plain);
+    return toB32(salt.concat(body, [(c >>> 8) & 255, c & 255]));
+  }
+  function readTicket(str) {
+    str = String(str || "").trim().toLowerCase();
+    var hashAt = str.lastIndexOf("#");
+    if (hashAt >= 0) str = str.slice(hashAt + 1);
+    str = str.replace(/[^a-z2-7]/g, "");
+    if (str.length < 16) return null;
+    var bytes = fromB32(str);
+    if (!bytes || bytes.length < 8) return null;
+    var salt = bytes.slice(0, 3);
+    var check = (bytes[bytes.length - 2] << 8) | bytes[bytes.length - 1];
+    var ks = stream(seedFor(salt));
+    var plain = bytes.slice(3, bytes.length - 2).map(function (b) { return b ^ ks(); });
+    if ((fnv(plain) & 0xffff) !== check) return null;
+    var text;
+    try { text = fromUtf8(plain); } catch (e) { return null; }
+    var parts = text.split(SEP);
+    if (parts.length < 5 || parts[0] !== "1" || !parts[1] || !parts[2]) return null;
+    return { code: str, giver: parts[1], receiver: parts[2], hat: parts[3], note: parts.slice(4).join(SEP) };
+  }
+  /*TICKET-END*/
+
+  /* ---------- organizer state ---------- */
+  function blankState() { return { people: [], rules: [], note: "", sealed: null, sent: {}, example: false }; }
+  function exampleState() {
+    var s = blankState();
+    s.people = EXAMPLE_NAMES.map(function (n, i) { return { id: "ex" + i, name: n }; });
+    var byName = {};
+    s.people.forEach(function (p) { byName[p.name] = p.id; });
+    s.rules = EXAMPLE_RULES.map(function (r) { return [byName[r[0]], byName[r[1]]]; });
+    s.example = true;
+    return s;
+  }
+  function isValid(s) { return s && Array.isArray(s.people) && Array.isArray(s.rules); }
+  function normalize(s) {
+    var n = blankState();
+    n.people = s.people; n.rules = s.rules;
+    n.note = typeof s.note === "string" ? s.note : "";
+    n.sealed = s.sealed && s.sealed.tickets ? s.sealed : null;
+    n.sent = s.sent && typeof s.sent === "object" ? s.sent : {};
+    n.example = !!s.example;
+    return n;
+  }
+  function loadSaved() {
+    try {
+      var raw = localStorage.getItem(KEY);
+      if (raw) { var s = JSON.parse(raw); if (isValid(s)) return normalize(s); }
+      var old = localStorage.getItem(OLD_KEY);
+      if (old) { var o = JSON.parse(old); if (isValid(o)) return normalize({ people: o.people, rules: o.rules, example: o.example }); }
+    } catch (e) {}
+    return null;
+  }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+  function person(id) {
+    for (var i = 0; i < state.people.length; i++) if (state.people[i].id === id) return state.people[i];
+    return null;
+  }
+  function nameOf(id) { var p = person(id); return p ? p.name : "?"; }
+  function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text != null) n.textContent = text;
+    return n;
+  }
+  function setMsg(id, text, isError) {
+    var m = $(id);
+    m.textContent = text || "";
+    m.classList.toggle("error", !!(text && isError));
+  }
+  function clearMsgs() { ["name-msg", "rule-msg", "draw-msg", "paste-msg"].forEach(function (i) { setMsg(i, ""); }); }
+  function linkFor(code) { return SHARE_URL + "#" + code; }
+  function messageFor(name, code) {
+    return "Hi " + name + "! Your Secret Santa name is waiting in the hat. This link is just for you, so don't share it. Tap to pull your name: " + linkFor(code);
+  }
+  function shortDate(ms) {
+    try { return new Date(ms).toLocaleDateString(undefined, { month: "short", day: "numeric" }); } catch (e) { return ""; }
+  }
+
+  /* ---------- routing ---------- */
+  function currentTicketText() {
+    var h = "";
+    try { h = decodeURIComponent((location.hash || "").slice(1)); } catch (e) { h = (location.hash || "").slice(1); }
+    return h;
+  }
+  function route() {
+    var h = currentTicketText();
+    if (h && h.length >= 16) {
+      $("organizer").hidden = true;
+      $("person").hidden = false;
+      renderPerson(readTicket(h));
+    } else {
+      $("person").hidden = true;
+      $("organizer").hidden = false;
+      renderOrganizer();
+    }
+  }
+  function openTicket(t) {
+    try { location.hash = t.code; } catch (e) {}
+    $("organizer").hidden = true;
+    $("person").hidden = false;
+    renderPerson(t);
+    try { window.scrollTo(0, 0); } catch (e) {}
+  }
+
+  /* ---------- person view ---------- */
+  function pulledSet() {
+    try { var r = JSON.parse(localStorage.getItem(PULLED_KEY) || "{}"); return r && typeof r === "object" ? r : {}; } catch (e) { return {}; }
+  }
+  function markPulled(code) {
+    try { var s = pulledSet(); s[code.slice(0, 24)] = Date.now(); localStorage.setItem(PULLED_KEY, JSON.stringify(s)); } catch (e) {}
+  }
+  function renderPerson(t) {
+    $("ticket-ok").hidden = !t;
+    $("ticket-bad").hidden = !!t;
+    $("riser").classList.remove("go");
+    $("pull-hat").classList.remove("shake");
+    if (!t) { document.title = "Secret Santa Hat"; return; }
+    document.title = "Secret Santa for " + t.giver;
+    $("pull-eyebrow").textContent = "Secret Santa" + (t.hat ? " · Hat #" + t.hat : "");
+    $("pull-hi").textContent = "Hi " + t.giver + "!";
+    $("tag-name").textContent = t.receiver;
+    $("tag-note").textContent = t.note || "";
+    $("tag-note").hidden = !t.note;
+    var already = !!pulledSet()[t.code.slice(0, 24)];
+    $("before-pull").hidden = already;
+    $("after-pull").hidden = !already;
+    $("result-title").textContent = already ? "You pulled" : "You're buying a gift for";
+    var btn = $("pull");
+    btn.disabled = false;
+    btn.textContent = "Pull a name from the hat";
+    btn.onclick = function () { doPull(t); };
+  }
+  function doPull(t) {
+    var btn = $("pull");
+    btn.disabled = true;
+    btn.textContent = "Reaching in…";
+    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var hat = $("pull-hat"), riser = $("riser");
+    hat.classList.remove("shake"); riser.classList.remove("go");
+    void hat.getBoundingClientRect();
+    hat.classList.add("shake"); riser.classList.add("go");
+    markPulled(t.code);
+    $("result-title").textContent = "You're buying a gift for";
+    setTimeout(function () {
+      $("before-pull").hidden = true;
+      $("after-pull").hidden = false;
+      $("tag").style.animationDelay = reduce ? "0s" : "0.25s";
+      try { $("after-pull").scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" }); } catch (e) {}
+    }, reduce ? 0 : 1250);
+  }
+
+  /* ---------- organizer view ---------- */
+  function renderOrganizer() {
+    var sealed = !!state.sealed;
+    $("setup").hidden = sealed;
+    $("sealed").hidden = !sealed;
+    if (sealed) renderSealed(); else renderSetup();
+  }
+
+  function renderSetup() {
+    var n = state.people.length;
+    $("example-banner").hidden = !state.example;
+    $("count").textContent = n === 1 ? "1 person" : n + " people";
+    $("slips-empty").hidden = n > 0;
+    $("clear-all").hidden = n === 0 || state.example;
+    if (document.activeElement !== $("note-input")) $("note-input").value = state.note || "";
+
+    var list = $("slips");
+    list.textContent = "";
+    state.people.forEach(function (p, i) {
+      var li = el("li", "slip");
+      li.style.setProperty("--tilt", TILTS[i % TILTS.length] + "deg");
+      li.appendChild(el("span", "slip-name", p.name));
+      var x = el("button", "slip-x", "×");
+      x.type = "button";
+      x.setAttribute("aria-label", "Remove " + p.name);
+      x.addEventListener("click", function () { removePerson(p.id); });
+      li.appendChild(x);
+      list.appendChild(li);
+    });
+
+    fillSelect($("rule-a"));
+    fillSelect($("rule-b"));
+
+    var rl = $("rules");
+    rl.textContent = "";
+    state.rules.forEach(function (r, i) {
+      var li = el("li", "rule");
+      var pair = el("span", "rule-pair");
+      pair.appendChild(document.createTextNode(nameOf(r[0])));
+      pair.appendChild(el("span", "amp", "&"));
+      pair.appendChild(document.createTextNode(nameOf(r[1])));
+      li.appendChild(pair);
+      var x = el("button", "slip-x", "×");
+      x.type = "button";
+      x.setAttribute("aria-label", "Remove rule for " + nameOf(r[0]) + " and " + nameOf(r[1]));
+      x.addEventListener("click", function () {
+        state.rules.splice(i, 1);
+        save(); clearMsgs(); renderOrganizer();
+      });
+      li.appendChild(x);
+      rl.appendChild(li);
+    });
+  }
+
+  function fillSelect(sel) {
+    var keep = sel.value;
+    sel.textContent = "";
+    var ph = el("option", null, "Choose one");
+    ph.value = "";
+    sel.appendChild(ph);
+    state.people.forEach(function (p) {
+      var o = el("option", null, p.name);
+      o.value = p.id;
+      sel.appendChild(o);
+    });
+    sel.value = person(keep) ? keep : "";
+  }
+
+  function renderSealed() {
+    var s = state.sealed;
+    var n = s.order.length;
+    var sentCount = s.order.filter(function (id) { return state.sent[id]; }).length;
+    $("sent-count").textContent = sentCount + " of " + n + " sent";
+    $("sent-bar").style.width = (n ? (sentCount / n) * 100 : 0) + "%";
+    $("hat-label").textContent = "Hat #" + s.hat + " · sealed " + shortDate(s.at) + (s.note ? " · note: " + s.note : "");
+
+    var list = $("send-list");
+    list.textContent = "";
+    s.order.forEach(function (id, i) {
+      var sent = !!state.sent[id];
+      var name = s.names[id];
+      var li = el("li", "send-row" + (sent ? " sent" : ""));
+      li.style.setProperty("--tilt", (TILTS[(i + 2) % TILTS.length] * 0.35) + "deg");
+      var who = el("div", "send-who");
+      who.appendChild(el("span", "send-name", name));
+      who.appendChild(el("span", "send-state", sent ? "Copied ✓" : "Not sent yet"));
+      li.appendChild(who);
+      var b = el("button", "btn btn-berry", sent ? "Copy again" : "Copy message");
+      b.type = "button";
+      b.id = "copy-" + id;
+      b.setAttribute("aria-label", "Copy the message for " + name);
+      b.addEventListener("click", function () { copyFor(id); });
+      li.appendChild(b);
+      list.appendChild(li);
+    });
+  }
+
+  function copyFor(id) {
+    var s = state.sealed;
+    var text = messageFor(s.names[id], s.tickets[id]);
+    function done() {
+      state.sent[id] = true;
+      save(); renderSealed();
+      var b = $("copy-" + id);
+      if (b) { b.textContent = "Copied!"; b.focus(); }
+    }
+    function fallback() { showCopySheet(s.names[id], text, done); }
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done, fallback);
+      } else fallback();
+    } catch (e) { fallback(); }
+  }
+
+  /* ---------- organizer actions ---------- */
+  function addName(e) {
+    e.preventDefault();
+    var input = $("name-input");
+    var name = input.value.replace(/[\u0000-\u001f]/g, "").replace(/\s+/g, " ").trim();
+    if (!name) { setMsg("name-msg", "Type a name first, then tap Add.", true); input.focus(); return; }
+    var dup = state.people.some(function (p) { return p.name.toLowerCase() === name.toLowerCase(); });
+    if (dup) { setMsg("name-msg", name + " is already in the hat. Add a last initial to tell them apart.", true); input.select(); return; }
+    var id = newId();
+    while (person(id)) id = newId();
+    state.people.push({ id: id, name: name });
+    input.value = "";
+    clearMsgs();
+    save(); renderOrganizer();
+    input.focus();
+  }
+
+  function removePerson(id) {
+    state.people = state.people.filter(function (p) { return p.id !== id; });
+    state.rules = state.rules.filter(function (r) { return r[0] !== id && r[1] !== id; });
+    if (state.people.length === 0) state.example = false;
+    clearMsgs(); save(); renderOrganizer();
+  }
+
+  function addRule(e) {
+    e.preventDefault();
+    var a = $("rule-a").value, b = $("rule-b").value;
+    if (!a || !b) { setMsg("rule-msg", "Pick two people from the lists.", true); return; }
+    if (a === b) { setMsg("rule-msg", "Pick two different people.", true); return; }
+    var k = ruleKey(a, b);
+    if (state.rules.some(function (r) { return ruleKey(r[0], r[1]) === k; })) {
+      setMsg("rule-msg", nameOf(a) + " and " + nameOf(b) + " are already kept apart.", true); return;
+    }
+    state.rules.push([a, b]);
+    $("rule-a").value = ""; $("rule-b").value = "";
+    clearMsgs(); save(); renderOrganizer();
+  }
+
+  function trySeal() {
+    clearMsgs();
+    state.note = $("note-input").value.replace(/[\u0000-\u001f]/g, "").replace(/\s+/g, " ").trim();
+    save();
+    if (state.people.length < 3) { setMsg("draw-msg", "Add at least 3 people before sealing the hat.", true); return; }
+    var ids = state.people.map(function (p) { return p.id; });
+    var result = makeDraw(ids, state.rules);
+    if (result.error === "stuck") {
+      var who = nameOf(result.who);
+      setMsg("draw-msg", "There's nobody left for " + who + " to pull. Remove one of " + who + "'s rules.", true); return;
+    }
+    if (result.error) {
+      setMsg("draw-msg", "These rules leave no way for everyone to get a name. Remove a rule and try again.", true); return;
+    }
+    var exampleNote = state.example ? "These are still the sample names. " : "";
+    confirmBox(
+      "Seal the hat?",
+      exampleNote + "Everyone gets matched now and you'll get one link per person. You can't see or change the matches after this without starting over.",
+      "Seal it",
+      function () { seal(result.draw); }
+    );
+  }
+
+  function seal(draw) {
+    var hat = hatCode();
+    var names = {}, tickets = {};
+    state.people.forEach(function (p) { names[p.id] = p.name; });
+    state.people.forEach(function (p) {
+      tickets[p.id] = makeTicket(p.name, names[draw[p.id]], hat, state.note);
+    });
+    draw = null;
+    var btn = $("seal");
+    btn.disabled = true;
+    btn.textContent = "Shaking the hat…";
+    var h = $("hat");
+    h.classList.remove("shake"); void h.getBoundingClientRect(); h.classList.add("shake");
+    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    setTimeout(function () {
+      state.sealed = { hat: hat, at: Date.now(), note: state.note, order: state.people.map(function (p) { return p.id; }), names: names, tickets: tickets };
+      state.sent = {};
+      save();
+      btn.disabled = false;
+      btn.textContent = "Seal the hat";
+      renderOrganizer();
+      try { window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" }); } catch (e) { window.scrollTo(0, 0); }
+    }, reduce ? 0 : 850);
+  }
+
+  function pasteOpen(inputId, msgId) {
+    return function (e) {
+      e.preventDefault();
+      var t = readTicket($(inputId).value);
+      if (!t) { setMsg(msgId, "That doesn't look like a whole Secret Santa link. Copy the full link from the text and try again.", true); return; }
+      setMsg(msgId, "");
+      $(inputId).value = "";
+      openTicket(t);
+    };
+  }
+
+  /* ---------- overlay ---------- */
+  var lastFocus = null;
+  function showSheet(build, focusSel) {
+    var sheet = $("sheet");
+    sheet.textContent = "";
+    build(sheet);
+    if ($("overlay").hidden) lastFocus = document.activeElement;
+    $("overlay").hidden = false;
+    document.body.style.overflow = "hidden";
+    var f = sheet.querySelector(focusSel || ".btn");
+    if (f) f.focus();
+  }
+  function closeSheet() {
+    $("sheet").textContent = "";
+    $("overlay").hidden = true;
+    document.body.style.overflow = "";
+    if (lastFocus && document.body.contains(lastFocus)) lastFocus.focus();
+  }
+  function button(cls, text, onClick) {
+    var b = el("button", "btn " + cls, text);
+    b.type = "button";
+    b.addEventListener("click", onClick);
+    return b;
+  }
+  function confirmBox(title, body, okText, onOk) {
+    showSheet(function (s) {
+      var h = el("h3", null, title);
+      h.id = "sheet-title";
+      s.appendChild(h);
+      s.appendChild(el("p", null, body));
+      var actions = el("div", "sheet-actions");
+      actions.appendChild(button("btn-berry", okText, function () { closeSheet(); onOk(); }));
+      actions.appendChild(button("btn-ghost", "Cancel", closeSheet));
+      s.appendChild(actions);
+    });
+  }
+  function showCopySheet(name, text, onDone) {
+    showSheet(function (s) {
+      var h = el("h3", null, "Copy " + name + "'s message");
+      h.id = "sheet-title";
+      s.appendChild(h);
+      s.appendChild(el("p", null, "Your browser blocked the Copy button. Press and hold the text below, choose Select All, then Copy."));
+      var ta = el("textarea");
+      ta.id = "copy-text";
+      ta.rows = 6;
+      ta.readOnly = true;
+      ta.value = text;
+      s.appendChild(ta);
+      var actions = el("div", "sheet-actions");
+      actions.appendChild(button("btn-berry", "I copied it", function () { closeSheet(); onDone(); }));
+      actions.appendChild(button("btn-ghost", "Cancel", closeSheet));
+      s.appendChild(actions);
+    }, "#copy-text");
+    try { var ta = $("copy-text"); ta.focus(); ta.select(); } catch (e) {}
+  }
+
+  /* ---------- wire up ---------- */
+  function wire() {
+    if (wired) return;
+    wired = true;
+    $("name-form").addEventListener("submit", addName);
+    $("rule-form").addEventListener("submit", addRule);
+    $("seal").addEventListener("click", trySeal);
+    $("note-input").addEventListener("change", function () {
+      state.note = $("note-input").value.trim(); save();
+    });
+    $("paste-form").addEventListener("submit", pasteOpen("paste-input", "paste-msg"));
+    $("paste-form-2").addEventListener("submit", pasteOpen("paste-input-2", "paste-msg-2"));
+    $("clear-examples").addEventListener("click", function () {
+      state = blankState();
+      clearMsgs(); save(); renderOrganizer();
+      $("name-input").focus();
+    });
+    $("clear-all").addEventListener("click", function () {
+      confirmBox("Remove everyone?", "This clears every name and rule so you can build a new list.", "Remove everyone", function () {
+        state = blankState();
+        clearMsgs(); save(); renderOrganizer();
+      });
+    });
+    $("start-over").addEventListener("click", function () {
+      confirmBox(
+        "Unseal and start over?",
+        "Links you already sent will still open the old matches. If you draw again, send everyone their new link and tell them to ignore the old one. Your names and rules stay.",
+        "Unseal the hat",
+        function () {
+          state.sealed = null;
+          state.sent = {};
+          save(); renderOrganizer();
+          try { window.scrollTo(0, 0); } catch (e) {}
+        }
+      );
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && !$("overlay").hidden) closeSheet();
+    });
+    window.addEventListener("hashchange", route);
+  }
+
+  function boot(data) {
+    state = isValid(data) ? normalize(data) : (loadSaved() || exampleState());
+    wire();
+    route();
+    try { if (window.claude && window.claude.hot) window.claude.hot.snapshot(function () { return state; }); } catch (e) {}
+  }
+
+  var hot = window.claude && window.claude.hot;
+  if (hot && hot.ready) hot.ready(boot); else boot(hot && hot.data ? hot.data : {});
+})();
+</script>
+</body>
+</html>
